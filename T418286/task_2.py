@@ -17,10 +17,10 @@ max_url_retries=3
 
 request_header={
     "User-Agent": (
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
+        "Mozilla/5.0 (Windows NT 11.0; Win64; x64) "
         "AppleWebKit/537.36 (KHTML, like Gecko) "
-        "Chrome/120.0.0.0 Safari/537.36"
-    )
+        "Chrome/134.0.0.0 Safari/537.36"
+    ) 
 }
 
 # To reset color and initialize colorama
@@ -329,12 +329,10 @@ def main():
 
     # Visit URLs
     check_url(url,current,total)
-
-    #print(f"Processed {current} rows.")
-    #print(f"Unique URLs checked: {len(visitedUrls)}")
+    time.sleep(2) # For rate limiting and to avoid overwhelming servers 
 
   print_summary()
   save_results()
 
-if __name__ == "__main__":
+if __name__=="__main__":
   main()
