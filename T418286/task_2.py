@@ -329,7 +329,7 @@ def main():
 
     # Visit URLs
     check_url(url,current,total)
-    time.sleep(2) # For rate limiting and to avoid overwhelming servers 
+    time.sleep(2) # To rate limit and to avoid overwhelming servers 
 
   print_summary()
   save_results()
