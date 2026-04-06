@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Anjali_Dwivedi - Task 1</title>
+        <style>
+            .block { background-color:gainsboro; padding:1em; }
+            body{
+                font-family: Arial, Helvetica, sans-serif;
+                background: #ffffff;
+                padding: 1.5em 2em;
+                color: #202122;
+                max-width: 960px;
+                margin: 0 auto;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+            h1{
+                font-family: 'Linux Libertine', Georgia, serif;
+                font-size: 1.95em;
+                font-weight: normal;
+                border-bottom: 1px solid #a2a9b1;
+                padding-bottom: 0.3em;
+                margin-bottom: 0.8em;
+                color: #000;
+            }
+            h2{
+               font-family: 'Linux Libertine', Georgia, serif;
+               font-size: 1.4em;
+               font-weight: normal;
+               border-bottom: 1px solid #a2a9b1;
+               padding-bottom: 0.2em;
+               margin-bottom: 0.6em;
+               color: #000; 
+            }
+            hr.divider{
+                border: none;
+                border-top: 1px solid #a2a9b1;
+                margin: 1em 0 1.2em 0;
+            }
+            #controls{
+                display: flex;
+                align-items: center;
+                gap: 0.6em;
+                flex-wrap: wrap;
+                margin-bottom: 0.4em;
+            }
+            #searchBox{
+                padding: 5px 10px;
+                font-size: 0.9em;
+                border: 1px solid #a2a9b1;
+                width: 260px;
+                font-family: Arial, sans-serif;
+                background: white;
+                color: #202122;
+            }
+            #searchBox:focus{
+                outline: 1px solid #0645ad;
+                border-color: #0645ad;
+            }
+            .sortBtn{
+                padding: 4px 10px;
+                font-size: 0.88em;
+                border: none;
+                border-bottom: 2px solid transparent;
+                background: transparent;
+                color: #0645ad;
+                cursor: pointer;
+                font-family: Arial, sans-serif;
+            }
+            .sortBtn.active{
+                border-bottom: 2px solid #0645ad;
+                font-weight: bold;
+            }
+            .sortBtn:hover{
+                border-bottom: 2px solid #a2a9b1;
+            }
+            #articleCount{
+                font-size: 0.82em;
+                color: #72777d;
+                margin-bottom: 0.4em;
+            }
+            #results{
+                background: white;
+                margin-bottom: 1.2em;
+            }
+            .article-line{
+                padding: 0.55em 0.4em;
+                font-size: 0.95em;
+                line-height: 1.6;
+            }
+            .article-line:nth-child(odd){
+                background: #f8f9fa;
+            }
+            .article-line:nth-child(even){
+                background: #ffffff;
+            }
+            .art-num{
+                color: #72777d;
+                margin-right: 5px;
+                font-size: 0.88em;
+            }
+            .wiki-link{
+                color: #0645ad;
+                text-decoration: none;
+            }
+            .wiki-link:hover{
+                text-decoration: underline;
+            }
+            .highlight{
+                font-weight: bold;
+            }
+            #noResults{
+                display: none;
+                font-style: italic;
+                color: #72777d;
+                padding: 0.6em 0.4em;
+                font-size: 0.9em;
+            }
+            .msg{
+                color: #72777d;
+                font-style: italic;
+                padding: 0.5em 0;
+            }
+            #stats{
+                border: 1px solid #cdd5dd;
+                background: #f8f9fa;
+                padding: 0.8em 1em;
+            }
+            #stats .stats-title{
+                font-family: 'Linux Libertine', Georgia, serif;
+                font-size: 1em;
+                font-weight: bold;
+                color: #000;
+                border-bottom: 1px solid #cdd5dd;
+                padding-bottom: 0.3em;
+                margin-bottom: 0.5em;
+            }
+            #stats .stats-row{
+                display: flex;
+                padding: 0.22em 0;
+                font-size: 0.9em;
+                border-bottom: 1px solid #eaecf0;
+            }
+            #stats .stats-row:last-child{
+                border-bottom: none;
+            }
+            #stats .stats-key{
+                font-weight: bold;
+                width: 150px;
+                color: #333;
+                flex-shrink: 0;
+            }
+            #stats .stats-val{
+                color: #555;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>Anjali_Dwivedi - Task 1</h1>
+        <h2>My code:</h2>
+        <p id="code" class="block"></p>
+        <h2>Results of my code:</h2>
+        <div id="controls">
+                <input type="text" id="searchBox" placeholder="Search by title, page ID or date..." autocomplete="off"/>
+                <button class="sortBtn active" data-sort="az">Sort A-Z</button>
+                <button class="sortBtn" data-sort="oldest">Oldest First</button>
+                <button class="sortBtn" data-sort="latest">Latest First</button>
+        </div>
+        <div id="articleCount"></div>
+        <div id="noResults"></div>
+        <p id="results" class="block"></p>
+        <hr class="divider"/>
+        <div id="stats"></div>
+        <script id="task_id">
+            // INPUT 
+            let data = [
+                {"page_id": 6682420, "creation_date": "2021-09-13", "title": "André Baniwa"},
+                {"page_id": 4246775, "creation_date": "2013-12-10", "title": "Benki Piyãko"},
+                {"page_id": 5882073, "creation_date": "2018-12-03", "title": "Célia Xakriabá"},
+                {"page_id": 6977673, "creation_date": "2022-10-05", "title": "Chirley Pankará"},
+                {"page_id": 7069044, "creation_date": "2023-02-16", "title": "Cristine Takuá"},
+                {"page_id": 2119511, "creation_date": "2009-01-28", "title": "Eliane Potiguara"},
+                {"page_id": 6714407, "creation_date": "2021-10-09", "title": "Jaider Esbell"},
+                {"page_id": 6977117, "creation_date": "2022-10-04", "title": "Jerônimo Rodrigues"},
+                {"page_id": 6935831, "creation_date": "2022-08-02", "title": "Nanblá Gakran"},
+                {"page_id": 4908665, "creation_date": "2015-11-13", "title": "Sônia Guajajara"},
+                {"page_id": 5886895, "creation_date": "2018-12-12", "title": "Vãngri Kaingáng"},
+                {"page_id": 6549130, "creation_date": "2021-04-10", "title": "Zezico Guajajara"},
+            ];
+
+            // YOUR CODE HERE 
+            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            // XSS safe function as innerHTML is used.
+            function escapeHTML(str) {
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#x27;');
+            }
+            // Normalize title, date, and pageid for search
+            function normalize(str){
+                return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            }
+            // Validate the maximum days in a month
+            function getMaxDays(month,year){
+                if(month===2){
+                    let isLeap=(year%4===0 && year%100!==0) || (year%400===0);
+                    return isLeap?29:28;
+                }
+                return [31,28,31,30,31,30,31,31,30,31,30,31][month-1];
+            }
+            // Function to format date
+            function formatDate(date){
+                if(date===null || date===undefined) return "Unknown Date";
+                date=String(date).trim();
+                if (date==="") return "Unknown Date";
+                let parts=date.split("-");
+                if(parts.length!==3) return "Unknown Date";
+                let year=parts[0].trim();
+                let month=parseInt(parts[1],10);
+                let day=parseInt(parts[2],10);
+                if(isNaN(month) || month<1 || month>12) return "Unknown Date";
+                //if(isNaN(day) || day<1 || day>31) return "Unknown Date";
+                if(isNaN(day) || day<1 || day>getMaxDays(month,parseInt(year,10))) return "Unknown Date";
+                return months[month - 1]+ " "+day+", "+year;
+            }
+            // Highlight the matched text
+            function applyHighlight(text, query){
+                if(!query || query.trim()==="") return escapeHTML(text);
+                let q=query.trim();
+                let escapedQ=q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                let regex=new RegExp("(" + escapedQ + ")", "gi");
+
+                let parts=text.split(regex);
+                let result="";
+                for(let i=0;i<parts.length;i++){
+                    if(parts[i].toLowerCase()===q.toLowerCase()){
+                        result+='<strong class="highlight">'+escapeHTML(parts[i])+'</strong>';
+                    } else {
+                        result+=escapeHTML(parts[i]);
+                    }
+                }
+                return result;
+            }
+            function buildArticleLine(article, index, query){
+                // Handle missing fields
+
+                let title=article.title;
+                if(title===null || title===undefined){
+                    title="Unknown Article";
+                }
+                title=String(title).trim();
+                if(title===""){
+                    title="Untitled Article";
+                }
+
+                let pageId=article.page_id;
+                if(pageId===null || pageId===undefined){
+                    pageId="Unknown ID";
+                }
+
+                // Format date
+                let formatted=formatDate(article.creation_date);
+                // Line container div
+                let lineDiv=document.createElement("div");
+                lineDiv.className="article-line";
+                // Number span
+                let numSpan=document.createElement("span");
+                numSpan.className="art-num";
+                numSpan.textContent=index+". ";
+                lineDiv.appendChild(numSpan);
+
+                // Opening quote
+                lineDiv.appendChild(document.createTextNode('Article "'));
+
+                // Clickable Wikipedia link
+
+                // NOTE: If a title doesn't resolve (article renamed or doesn't exist on pt.wikipedia.org),
+                // a fallback using MediaWiki API can be used to return the canonical URL directly from Wikipedia's database.
+                if(typeof pageId === "number"){
+                    let link=document.createElement("a");
+                    link.className="wiki-link";
+                    // curid is not working properly
+                    //link.href="https://en.wikipedia.org/?curid="+pageId; 
+                    link.href = "https://pt.wikipedia.org/wiki/" + encodeURIComponent(title.replace(/ /g, "_"));
+                    link.target="_blank"; 
+                    link.rel="noopener noreferrer";
+                
+                    link.innerHTML=applyHighlight(title, query);
+                    lineDiv.appendChild(link);
+                } else {
+                    let titleSpan=document.createElement("span");
+                    titleSpan.innerHTML=applyHighlight(title, query);
+                    lineDiv.appendChild(titleSpan);
+                }
+
+                // Closing quote
+                lineDiv.appendChild(document.createTextNode('"'));
+
+                // Rest of sentence with pageId and date
+                let restSpan=document.createElement("span");
+                let pageIdHighlight=applyHighlight(String(pageId), query);
+                let dateHighlight=applyHighlight(formatted, query);
+                restSpan.innerHTML=" (Page ID "+ pageIdHighlight +") was created at "+ dateHighlight + ".";
+
+                lineDiv.appendChild(restSpan);
+                return lineDiv;
+            }
+            // Render function
+            let currentSort="az";
+            let processed=[];
+
+            function render(query){
+                let resultsDiv=document.getElementById("results");
+                if(!resultsDiv){
+                    console.error(" #results element not found");
+                    return;
+                }
+                resultsDiv.innerHTML="";
+                
+                // Sort a copy
+                let sorted=processed.slice();
+
+                if(currentSort==="az"){
+                    sorted.sort(function(a,b){
+                        return(a.title || "").localeCompare(b.title || "");
+                    });
+                } else if(currentSort==="oldest"){
+                    sorted.sort(function(a,b){
+                        return (a.creation_date || "").localeCompare(b.creation_date || "");
+                    });
+                } else if(currentSort==="latest"){
+                    sorted.sort(function(a,b){
+                        return (b.creation_date || "").localeCompare(a.creation_date || "");
+                    });
+                }
+                 
+                // Filter by query
+                let q=query?query.trim().toLowerCase():"";
+                let filtered=sorted;
+
+                if(q!==""){
+                    filtered=sorted.filter(function(article){
+                        let t=normalize(article.title || "").toLowerCase();
+                        let id=String(article.page_id || "");
+                        let fd=normalize(formatDate(article.creation_date)).toLowerCase();
+                        let nq=normalize(q);
+                        return t.includes(nq) || id.includes(nq) || fd.includes(nq);
+                    });
+                }
+                //Update count
+                let countDiv=document.getElementById("articleCount");
+                if(countDiv){
+                    countDiv.textContent=q!==""?"Showing "+filtered.length+" of "+processed.length+" articles":"Showing "+processed.length+" articles";
+                }
+
+                // No result message
+                let noResultsDiv=document.getElementById("noResults");
+                if(filtered.length===0 && q!==""){
+                    if(noResultsDiv){
+                        noResultsDiv.style.display="block";
+                        noResultsDiv.textContent='No articles found matching "'+query.trim()+'".';
+                    }
+                } else {
+                    if(noResultsDiv){
+                        noResultsDiv.style.display="none";
+                    }
+                }
+
+                //Render lines
+                for(let i=0;i<filtered.length;i++){
+                    resultsDiv.appendChild(buildArticleLine(filtered[i], i+1, query));
+                }
+            }
+
+            // Sort articles
+            function sortArticles(mode){
+                currentSort=mode;
+                let buttons=document.querySelectorAll(".sortBtn");
+                buttons.forEach(function(btn){
+                    btn.classList.remove("active");
+                    if(btn.getAttribute("data-sort")===mode){
+                        btn.classList.add("active");
+                    }
+                });
+                render(document.getElementById("searchBox").value);
+            }
+            // stats
+            function showStats(){
+                let statsDiv=document.getElementById("stats");
+                if(!statsDiv || processed.length===0){
+                    return;
+                }
+                let byDate=processed.slice().sort(function(a,b){
+                    return (a.creation_date || "").localeCompare(b.creation_date || "");
+                });
+
+                let earliest=byDate[0];
+                let latest=byDate[byDate.length-1];
+
+                let earliestDate=formatDate(earliest.creation_date)+" \u2014 "+(earliest.title || "Unknown");
+                let latestDate=formatDate(latest.creation_date)+" \u2014 "+(latest.title || "Unknown");
+
+                let startYear=parseInt((earliest.creation_date || "0").split("-")[0],10);
+                let endYear=parseInt((latest.creation_date || "0").split("-")[0],10);
+                let span=(!isNaN(startYear) && !isNaN(endYear))?(endYear-startYear)+" years":"Unknown";
+
+                statsDiv.innerHTML="";
+
+                // Title
+                let titleDiv=document.createElement("div");
+                titleDiv.className="stats-title";
+                titleDiv.textContent="Statistics";
+                statsDiv.appendChild(titleDiv);
+
+                // Rows
+                [
+                    ["Total Articles", String(processed.length)],
+                    ["Earliest Article", earliestDate],
+                    ["Latest Article", latestDate],
+                    ["Timespan", span]
+                ].forEach(function(pair){
+                    let row=document.createElement("div");
+                    row.className="stats-row";
+
+                    let key=document.createElement("span");
+                    key.className="stats-key";
+                    key.textContent=pair[0];
+
+                    let val=document.createElement("span");
+                    val.className="stats-val";
+                    val.textContent=pair[1];
+                    
+                    row.appendChild(key);
+                    row.appendChild(val);
+                    statsDiv.appendChild(row);
+                });
+            }
+            // Main program
+            let finalResult=document.getElementById("results");
+            // #results element check
+            if(!finalResult){
+                console.error(" #results element not found");
+            } 
+            // Data validation
+            else if(data===null ||data===undefined ) {
+                let msg=document.createElement("span");
+                msg.className="msg";
+                msg.textContent="No data available.";
+                finalResult.appendChild(msg);
+            }
+            // Data is empty array
+            else if(data.length===0){
+                let msg=document.createElement("span");
+                msg.className="msg";
+                msg.textContent="No articles found.";
+                finalResult.appendChild(msg);    
+            }
+            // Deduplicate by page_id
+            else{
+                let visIds=new Set();
+                for(let i=0;i<data.length;i++){
+                    if(!visIds.has(data[i].page_id)){
+                        visIds.add(data[i].page_id);
+                        processed.push(data[i]);
+                    }
+                }
+
+                render("");
+                showStats();
+
+                //Live search
+                let searchBox=document.getElementById("searchBox");
+                if(searchBox){
+                    searchBox.addEventListener("input", function(){
+                        render(this.value);
+                    });
+                }
+
+                // Sort buttons
+                document.querySelectorAll(".sortBtn").forEach(function(btn){
+                    btn.addEventListener("click", function(){
+                        sortArticles(this.getAttribute("data-sort"));
+                    });
+                });
+
+                // Key press searchbox
+                document.addEventListener("keydown", function(e){
+                    let active=document.activeElement?document.activeElement.tagName.toLowerCase(): "";
+                    if(active!=="input" && active!=="textarea" && active!=="select"){
+                        if(e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){
+                            e.preventDefault();
+                            if(searchBox){
+                                searchBox.focus();
+                                searchBox.value+=e.key;
+                                render(searchBox.value);
+                            }
+                        }
+                    }
+                });
+            }
+
+        </script>
+        <script>
+            document.getElementById("code").innerText = document.getElementById("task_id").text;
+        </script>
+    </body>
+</html>
