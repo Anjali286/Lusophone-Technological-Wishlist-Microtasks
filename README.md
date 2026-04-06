@@ -1,4 +1,100 @@
-# Lusophone-Technological-Wishlist-Microtasks
+# Addressing the Lusophone Technological Wishlist Proposals
+
+## Task 1
+An HTML file that reads a JSON array of Wikipedia articles and displays each article in a formatted sentence with live search, bold highlighting of matched text, any-key-to-search, accent aware search, sort controls, clickable Wikipedia links, duplicate detection, XSS protection, and statistics table. 
+
+---
+
+### What it does
+- Reads 12 Wikipedia articles from the `data` variable
+- Formats each one into the required sentence and displays it inside `#results`
+- Numbers each article (1, 2, 3...)
+- Makes each article title a `clickable link` to its Portuguese Wikipedia page
+- Handles null data, empty arrays, and missing fields
+- Live search, sort controls, duplicate detection, statistics table
+
+---
+
+### How to run
+No installation. No libraries.  
+```
+Open task_1.html in any modern browser.
+```
+---
+
+### Output Format
+- Styled to match Wikipedia's visual language so the output feels native to the Wikimedia ecosystem
+- Displays each article in a formatted sentence:
+
+<img width="1003" height="763" alt="image" src="https://github.com/user-attachments/assets/70d17e38-0200-4d53-8bfd-bef0a2437f04" />
+
+---
+
+## Search
+- Filters articles in real time as being typed
+- Searches across title, page ID, and date
+- Normalizes accents so typing `Andre` finds `André`
+- Bolds the matched text inside each sentence
+- Any key press on the page automatically goes to the search box
+- Shows "No articles found matching..." when nothing matches
+- Shows "Showing X of 12 articles" count while filtering
+<img width="416" height="56" alt="image" src="https://github.com/user-attachments/assets/dce74033-f8e2-49b6-8395-80c550af1801" />
+
+---
+
+## Sort
+- Sort A-Z by title
+- Sort by oldest article first
+- Sort by latest article first
+- Highlights the active sort button with a blue underline
+- Sort and search work together at the same time
+<img width="371" height="52" alt="image" src="https://github.com/user-attachments/assets/3d9cc205-662f-4c6b-b2d2-87952e0a3b88" />
+
+---
+
+## Statistics table
+- Shows total number of articles
+- Shows earliest article with its date and title
+- Shows latest article with its date and title
+- Shows the time span between earliest and latest years
+<img width="898" height="250" alt="image" src="https://github.com/user-attachments/assets/fe766c36-4cff-4387-b476-8241bf2e1927" />
+
+---
+
+## Date handling
+- Converts `"2021-09-13"` to `"September 13, 2021"` by string splitting
+- Uses no Date object, avoids timezone issues completely
+- Validates month is between 1 and 12
+- Validates day against actual max days for that specific month
+- Checks leap year correctly for February
+- Returns `"Unknown Date"` for any invalid or missing date
+
+---
+
+## Duplicate handling
+- Checks for duplicate articles by `page_id` before rendering
+- If the same article appears more than once in the data, only the first occurrence is shown
+- The list is deduplicated silently — no duplicates ever reach the screen
+  
+---
+
+## Wikipedia Links
+- Every article title is a clickable link that opens the actual Portuguese Wikipedia page related to the article in a new tab
+- Links are built using the article title with `encodeURIComponent` to correctly handle accented Portuguese characters like `ã`, `é`, and `ô`
+
+---
+
+## Security
+- Escapes all strings before inserting into `innerHTML`
+- This converts dangerous characters into safe HTML entities:
+    -  `&` → `&amp;`
+    -  `<` → `&lt;`
+    -  `>` → `&gt;`
+    -  `"` → `&quot;`
+    -  `'` → `&#x27;`
+- Wikipedia links use `rel="noopener noreferrer"` for security
+
+---
 
 ## Task 2
 A Python script that reads a list of URLs from a CSV file, visits each one, and reports its HTTP status code, with color-coded output, detailed error classification, automatic internet recovery, duplicate detection, and a filterable CSV report.
@@ -12,7 +108,7 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 - Color-coded output for each status code based on what went wrong (or right)
 - Classifies errors specifically (Timeout, Connection Error, Domain not found, etc)
 - Detects and skips duplicate URLs automatically
-- If internet connection is interrupted, waits for it to come back and resumes from where it left off
+- If internet connection is interrupted, waits and retries up to maxInternetRetries times for it to come back and then resumes.
 - Saves all results to a timestamped CSV file that can be opened and filtered in any spreadsheet tool.
 - Prints a full summary at the end
  
