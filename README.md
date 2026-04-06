@@ -30,7 +30,7 @@ Open task_1.html in any modern browser.
 
 ---
 
-## Search
+### Search
 - Filters articles in real time as being typed
 - Searches across title, page ID, and date
 - Normalizes accents so typing `Andre` finds `André`
@@ -42,7 +42,7 @@ Open task_1.html in any modern browser.
 
 ---
 
-## Sort
+### Sort
 - Sort A-Z by title
 - Sort by oldest article first
 - Sort by latest article first
@@ -52,7 +52,7 @@ Open task_1.html in any modern browser.
 
 ---
 
-## Statistics table
+### Statistics table
 - Shows total number of articles
 - Shows earliest article with its date and title
 - Shows latest article with its date and title
@@ -61,7 +61,7 @@ Open task_1.html in any modern browser.
 
 ---
 
-## Date handling
+### Date handling
 - Converts `"2021-09-13"` to `"September 13, 2021"` by string splitting
 - Uses no Date object, avoids timezone issues completely
 - Validates month is between 1 and 12
@@ -71,20 +71,20 @@ Open task_1.html in any modern browser.
 
 ---
 
-## Duplicate handling
+### Duplicate handling
 - Checks for duplicate articles by `page_id` before rendering
 - If the same article appears more than once in the data, only the first occurrence is shown
 - The list is deduplicated silently — no duplicates ever reach the screen
   
 ---
 
-## Wikipedia Links
+### Wikipedia Links
 - Every article title is a clickable link that opens the actual Portuguese Wikipedia page related to the article in a new tab
 - Links are built using the article title with `encodeURIComponent` to correctly handle accented Portuguese characters like `ã`, `é`, and `ô`
 
 ---
 
-## Security
+### Security
 - Escapes all strings before inserting into `innerHTML`
 - This converts dangerous characters into safe HTML entities:
     -  `&` → `&amp;`
@@ -103,12 +103,12 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 
 ### What it does
 - Reads URLs from `Task 2 - Intern.csv`
-- Visits each URL and fetch its status code
+- Visits each URL and fetches its status code
 - Prints the result in the required format: `(Status Code) URL`
 - Color-coded output for each status code based on what went wrong (or right)
-- Classifies errors specifically (Timeout, Connection Error, Domain not found, etc)
+- Classifies each error specifically (Timeout, Connection Error, Domain not found, etc)
 - Detects and skips duplicate URLs automatically
-- If internet connection is interrupted, waits and retries up to maxInternetRetries times for it to come back and then resumes.
+- If internet connection is interrupted, waits and retries up to 3 times for it to come back and then resumes.
 - Saves all results to a timestamped CSV file that can be opened and filtered in any spreadsheet tool.
 - Prints a full summary at the end
  
@@ -183,7 +183,7 @@ This means `http://google.com`, `https://google.com`, `https://www.google.com/` 
 ---
 
 ### Summary printed at the end
-After all URLs are checked, some stats are being printed:
+After all URLs are checked, the following stats are printed:
 
 <img width="578" height="281" alt="image" src="https://github.com/user-attachments/assets/8a494e87-7ff9-4d69-b612-a2ce183e9e30" />
 
