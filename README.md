@@ -108,7 +108,7 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 - Color-coded output for each status code based on what went wrong (or right)
 - Classifies each error specifically (Timeout, Connection Error, Domain not found, etc)
 - Detects and skips duplicate URLs automatically
-- If internet connection is interrupted, waits and retries up to 3 times for it to come back and then resumes.
+- If internet connection is interrupted, waits and retries up to 5 times for it to come back and then resumes.
 - Saves all results to a timestamped CSV file that can be opened and filtered in any spreadsheet tool.
 - Prints a full summary at the end
  
