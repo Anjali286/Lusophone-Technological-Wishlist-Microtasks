@@ -23,7 +23,7 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 ```
 pip install -r requirements.txt
 ```
-**Step 2 - Place files in the same folder**
+**Step 2 - Place these files in the same folder**
 ```
 task_2.py
 Task 2 - Intern.csv
