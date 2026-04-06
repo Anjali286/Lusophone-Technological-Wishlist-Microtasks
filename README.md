@@ -26,7 +26,8 @@ Open task_1.html in any modern browser.
 - Styled to match Wikipedia's visual language so the output feels native to the Wikimedia ecosystem
 - Displays each article in a formatted sentence:
 
-<img width="1003" height="763" alt="image" src="https://github.com/user-attachments/assets/70d17e38-0200-4d53-8bfd-bef0a2437f04" />
+https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
+
 
 ---
 
