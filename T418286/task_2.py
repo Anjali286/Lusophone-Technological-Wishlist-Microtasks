@@ -27,7 +27,7 @@ request_header={
 init(autoreset=True)
 
 # Add timestamp to csv output file
-time_stamp=datetime.now().strftime("%Y%m%d_%H%M%S")
+time_stamp=datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
 output_CSV=f"results{time_stamp}.csv"
 
 # Add color to status code

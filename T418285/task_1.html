@@ -4,7 +4,10 @@
         <meta charset="UTF-8">
         <title>Anjali_Dwivedi - Task 1</title>
         <style>
-            .block { background-color:gainsboro; padding:1em; }
+            .block{ 
+                background-color: gainsboro; 
+                padding:1em; 
+            }
             body{
                 font-family: Arial, Helvetica, sans-serif;
                 background: #ffffff;
@@ -73,7 +76,7 @@
                 font-weight: bold;
             }
             .sortBtn:hover{
-                border-bottom: 2px solid #a2a9b1;
+                border-bottom: 2px solid hsl(212, 9%, 66%);
             }
             #articleCount{
                 font-size: 0.82em;
@@ -159,7 +162,7 @@
     <body>
         <h1>Anjali_Dwivedi - Task 1</h1>
         <h2>My code:</h2>
-        <p id="code" class="block"></p>
+        <div id="code" class="block"></div>
         <h2>Results of my code:</h2>
         <div id="controls">
                 <input type="text" id="searchBox" placeholder="Search by title, page ID or date..." autocomplete="off"/>
@@ -167,14 +170,17 @@
                 <button class="sortBtn" data-sort="oldest">Oldest First</button>
                 <button class="sortBtn" data-sort="latest">Latest First</button>
         </div>
+
         <div id="articleCount"></div>
         <div id="noResults"></div>
-        <p id="results" class="block"></p>
+        <div id="results" class="block"></div>
+
         <hr class="divider"/>
         <div id="stats"></div>
+        
         <script id="task_id">
             // INPUT 
-            let data = [
+            let data=[
                 {"page_id": 6682420, "creation_date": "2021-09-13", "title": "André Baniwa"},
                 {"page_id": 4246775, "creation_date": "2013-12-10", "title": "Benki Piyãko"},
                 {"page_id": 5882073, "creation_date": "2018-12-03", "title": "Célia Xakriabá"},
@@ -190,9 +196,12 @@
             ];
 
             // YOUR CODE HERE 
-            const months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-            // XSS safe function as innerHTML is used.
-            function escapeHTML(str) {
+            const months=["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+            let currentSort="az";
+            let processed=[];
+
+            // XSS safe function as innerHTML is used
+            function escapeHTML(str){
                 return String(str)
                     .replace(/&/g, '&amp;')
                     .replace(/</g, '&lt;')
@@ -200,52 +209,57 @@
                     .replace(/"/g, '&quot;')
                     .replace(/'/g, '&#x27;');
             }
+
             // Normalize title, date, and pageid for search
             function normalize(str){
-                return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+                if(str===null) return "";
+                return String(str).normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
             }
+
             // Validate the maximum days in a month
             function getMaxDays(month,year){
                 if(month===2){
-                    let isLeap=(year%4===0 && year%100!==0) || (year%400===0);
-                    return isLeap?29:28;
+                    const isLeap=(year%4===0 && year%100!==0) || (year%400===0);
+                    if(isLeap){
+                        return 29;
+                    }
                 }
                 return [31,28,31,30,31,30,31,31,30,31,30,31][month-1];
             }
+
             // Function to format date
             function formatDate(date){
                 if(date===null || date===undefined) return "Unknown Date";
+
                 date=String(date).trim();
                 if (date==="") return "Unknown Date";
-                let parts=date.split("-");
+                
+                const parts=date.split("-");
                 if(parts.length!==3) return "Unknown Date";
-                let year=parts[0].trim();
-                let month=parseInt(parts[1],10);
-                let day=parseInt(parts[2],10);
+
+                const year=parts[0].trim();
+                const month=parseInt(parts[1],10);
+                const day=parseInt(parts[2],10);
+
                 if(isNaN(month) || month<1 || month>12) return "Unknown Date";
-                //if(isNaN(day) || day<1 || day>31) return "Unknown Date";
                 if(isNaN(day) || day<1 || day>getMaxDays(month,parseInt(year,10))) return "Unknown Date";
+
                 return months[month - 1]+ " "+day+", "+year;
             }
+
             // Highlight the matched text
             function applyHighlight(text, query){
                 if(!query || query.trim()==="") return escapeHTML(text);
-                let q=query.trim();
-                let escapedQ=q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-                let regex=new RegExp("(" + escapedQ + ")", "gi");
+                const safeText=escapeHTML(text);
+                const q=query.trim();
+                const escapedQ=q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+                const regex=new RegExp("(" +escapedQ+ ")", "gi");
 
-                let parts=text.split(regex);
-                let result="";
-                for(let i=0;i<parts.length;i++){
-                    if(parts[i].toLowerCase()===q.toLowerCase()){
-                        result+='<strong class="highlight">'+escapeHTML(parts[i])+'</strong>';
-                    } else {
-                        result+=escapeHTML(parts[i]);
-                    }
-                }
-                return result;
+                return safeText.replace(regex, match=>`<strong class="highlight">${match}</strong>`);
             }
+
             function buildArticleLine(article, index, query){
+
                 // Handle missing fields
 
                 let title=article.title;
@@ -258,41 +272,42 @@
                 }
 
                 let pageId=article.page_id;
-                if(pageId===null || pageId===undefined){
+                if(pageId===null || pageId===undefined || typeof pageId!=="number"){
                     pageId="Unknown ID";
                 }
 
                 // Format date
-                let formatted=formatDate(article.creation_date);
+                const formatted=formatDate(article.creation_date);
+
                 // Line container div
-                let lineDiv=document.createElement("div");
+                const lineDiv=document.createElement("div");
                 lineDiv.className="article-line";
+                
                 // Number span
-                let numSpan=document.createElement("span");
+                const numSpan=document.createElement("span");
                 numSpan.className="art-num";
-                numSpan.textContent=index+". ";
+                numSpan.textContent=Number(index)+". ";
                 lineDiv.appendChild(numSpan);
 
                 // Opening quote
                 lineDiv.appendChild(document.createTextNode('Article "'));
 
                 // Clickable Wikipedia link
-
                 // NOTE: If a title doesn't resolve (article renamed or doesn't exist on pt.wikipedia.org),
-                // a fallback using MediaWiki API can be used to return the canonical URL directly from Wikipedia's database.
-                if(typeof pageId === "number"){
-                    let link=document.createElement("a");
+                // a fallback using MediaWiki API can be used to return the canonical URL directly from Wikipedia's database
+
+                if(title!=="Unknown Article" && title!=="Untitled Article"){
+                    const link=document.createElement("a");
                     link.className="wiki-link";
-                    // curid is not working properly
-                    //link.href="https://en.wikipedia.org/?curid="+pageId; 
-                    link.href = "https://pt.wikipedia.org/wiki/" + encodeURIComponent(title.replace(/ /g, "_"));
+                    link.href="https://pt.wikipedia.org/wiki/"+encodeURIComponent(title.replace(/ /g, "_"));
                     link.target="_blank"; 
                     link.rel="noopener noreferrer";
-                
+
+                    // innerHTML is safe as applyHighlight escapes all the content with escapeHTML
                     link.innerHTML=applyHighlight(title, query);
                     lineDiv.appendChild(link);
-                } else {
-                    let titleSpan=document.createElement("span");
+                }else{
+                    const titleSpan=document.createElement("span");
                     titleSpan.innerHTML=applyHighlight(title, query);
                     lineDiv.appendChild(titleSpan);
                 }
@@ -301,70 +316,62 @@
                 lineDiv.appendChild(document.createTextNode('"'));
 
                 // Rest of sentence with pageId and date
-                let restSpan=document.createElement("span");
-                let pageIdHighlight=applyHighlight(String(pageId), query);
-                let dateHighlight=applyHighlight(formatted, query);
-                restSpan.innerHTML=" (Page ID "+ pageIdHighlight +") was created at "+ dateHighlight + ".";
+                const restSpan=document.createElement("span");
+                const pageIdHighlight=applyHighlight(String(pageId), query);
+                const dateHighlight=applyHighlight(formatted, query);
 
+                restSpan.innerHTML=" (Page ID "+pageIdHighlight+") was created at "+dateHighlight+ ".";
                 lineDiv.appendChild(restSpan);
+
                 return lineDiv;
             }
-            // Render function
-            let currentSort="az";
-            let processed=[];
 
+            // Render function
             function render(query){
-                let resultsDiv=document.getElementById("results");
+                const resultsDiv=document.getElementById("results");
                 if(!resultsDiv){
-                    console.error(" #results element not found");
+                    console.error("#results element not found");
                     return;
                 }
                 resultsDiv.innerHTML="";
                 
                 // Sort a copy
-                let sorted=processed.slice();
-
+                const sorted=processed.slice();
                 if(currentSort==="az"){
-                    sorted.sort(function(a,b){
-                        return(a.title || "").localeCompare(b.title || "");
-                    });
-                } else if(currentSort==="oldest"){
-                    sorted.sort(function(a,b){
-                        return (a.creation_date || "").localeCompare(b.creation_date || "");
-                    });
-                } else if(currentSort==="latest"){
-                    sorted.sort(function(a,b){
-                        return (b.creation_date || "").localeCompare(a.creation_date || "");
-                    });
+                    sorted.sort((a, b)=>(a.title || "").localeCompare(b.title || ""));
+                }else if(currentSort==="oldest"){
+                    sorted.sort((a, b)=>new Date(a.creation_date || 0)-new Date(b.creation_date || 0));
+                }else if(currentSort==="latest") {
+                    sorted.sort((a, b)=>new Date(b.creation_date || 0)-new Date(a.creation_date || 0));
                 }
+
                  
                 // Filter by query
-                let q=query?query.trim().toLowerCase():"";
+                const q=query?query.trim().toLowerCase():"";
                 let filtered=sorted;
 
                 if(q!==""){
-                    filtered=sorted.filter(function(article){
-                        let t=normalize(article.title || "").toLowerCase();
-                        let id=String(article.page_id || "");
-                        let fd=normalize(formatDate(article.creation_date)).toLowerCase();
-                        let nq=normalize(q);
-                        return t.includes(nq) || id.includes(nq) || fd.includes(nq);
+                    filtered=sorted.filter(article=>{
+                        const t=normalize(article.title || "");
+                        const id=String(article.page_id || "");
+                        const fd=normalize(formatDate(article.creation_date));
+                        return t.includes(q) || id.includes(q) || fd.includes(q);
                     });
                 }
                 //Update count
-                let countDiv=document.getElementById("articleCount");
+                const countDiv=document.getElementById("articleCount");
                 if(countDiv){
                     countDiv.textContent=q!==""?"Showing "+filtered.length+" of "+processed.length+" articles":"Showing "+processed.length+" articles";
                 }
 
                 // No result message
-                let noResultsDiv=document.getElementById("noResults");
+                const noResultsDiv=document.getElementById("noResults");
                 if(filtered.length===0 && q!==""){
                     if(noResultsDiv){
                         noResultsDiv.style.display="block";
                         noResultsDiv.textContent='No articles found matching "'+query.trim()+'".';
                     }
-                } else {
+                }else{
                     if(noResultsDiv){
                         noResultsDiv.style.display="none";
                     }
@@ -379,39 +386,41 @@
             // Sort articles
             function sortArticles(mode){
                 currentSort=mode;
-                let buttons=document.querySelectorAll(".sortBtn");
-                buttons.forEach(function(btn){
-                    btn.classList.remove("active");
-                    if(btn.getAttribute("data-sort")===mode){
-                        btn.classList.add("active");
-                    }
+                const buttons=document.querySelectorAll(".sortBtn");
+                buttons.forEach(btn=>{
+                    const isActive=btn.getAttribute("data-sort")===mode;
+                    btn.classList.toggle("active", isActive);
+
                 });
-                render(document.getElementById("searchBox").value);
+                const searchBox=document.getElementById("searchBox");
+                const query=searchBox?searchBox.value:"";
+                render(query);
             }
-            // stats
+
+            // Show article statistics
             function showStats(){
-                let statsDiv=document.getElementById("stats");
+                const statsDiv=document.getElementById("stats");
                 if(!statsDiv || processed.length===0){
                     return;
                 }
-                let byDate=processed.slice().sort(function(a,b){
-                    return (a.creation_date || "").localeCompare(b.creation_date || "");
-                });
+                const byDate=processed.slice().sort((a,b)=>
+                    (a.creation_date || "").localeCompare(b.creation_date || "")
+                );
 
-                let earliest=byDate[0];
-                let latest=byDate[byDate.length-1];
+                const earliest=byDate[0];
+                const latest=byDate[byDate.length-1];
 
-                let earliestDate=formatDate(earliest.creation_date)+" \u2014 "+(earliest.title || "Unknown");
-                let latestDate=formatDate(latest.creation_date)+" \u2014 "+(latest.title || "Unknown");
+                const earliestDate=formatDate(earliest.creation_date)+" \u2014 "+(earliest.title || "Unknown");
+                const latestDate=formatDate(latest.creation_date)+" \u2014 "+(latest.title || "Unknown");
 
-                let startYear=parseInt((earliest.creation_date || "0").split("-")[0],10);
-                let endYear=parseInt((latest.creation_date || "0").split("-")[0],10);
-                let span=(!isNaN(startYear) && !isNaN(endYear))?(endYear-startYear)+" years":"Unknown";
+                const startYear=parseInt((earliest.creation_date || "0").split("-")[0],10);
+                const endYear=parseInt((latest.creation_date || "0").split("-")[0],10);
+                const span=(!isNaN(startYear) && !isNaN(endYear))?(endYear-startYear)+" years":"Unknown";
 
                 statsDiv.innerHTML="";
 
                 // Title
-                let titleDiv=document.createElement("div");
+                const titleDiv=document.createElement("div");
                 titleDiv.className="stats-title";
                 titleDiv.textContent="Statistics";
                 statsDiv.appendChild(titleDiv);
@@ -422,15 +431,15 @@
                     ["Earliest Article", earliestDate],
                     ["Latest Article", latestDate],
                     ["Timespan", span]
-                ].forEach(function(pair){
-                    let row=document.createElement("div");
+                ].forEach(pair=>{
+                    const row=document.createElement("div");
                     row.className="stats-row";
 
-                    let key=document.createElement("span");
+                    const key=document.createElement("span");
                     key.className="stats-key";
                     key.textContent=pair[0];
 
-                    let val=document.createElement("span");
+                    const val=document.createElement("span");
                     val.className="stats-val";
                     val.textContent=pair[1];
                     
@@ -439,29 +448,31 @@
                     statsDiv.appendChild(row);
                 });
             }
+
             // Main program
-            let finalResult=document.getElementById("results");
+
+            const finalResult=document.getElementById("results");
             // #results element check
             if(!finalResult){
                 console.error(" #results element not found");
-            } 
+            }
             // Data validation
             else if(data===null ||data===undefined ) {
-                let msg=document.createElement("span");
+                const msg=document.createElement("span");
                 msg.className="msg";
                 msg.textContent="No data available.";
                 finalResult.appendChild(msg);
             }
             // Data is empty array
             else if(data.length===0){
-                let msg=document.createElement("span");
+                const msg=document.createElement("span");
                 msg.className="msg";
                 msg.textContent="No articles found.";
                 finalResult.appendChild(msg);    
             }
             // Deduplicate by page_id
             else{
-                let visIds=new Set();
+                const visIds=new Set();
                 for(let i=0;i<data.length;i++){
                     if(!visIds.has(data[i].page_id)){
                         visIds.add(data[i].page_id);
@@ -473,7 +484,7 @@
                 showStats();
 
                 //Live search
-                let searchBox=document.getElementById("searchBox");
+                const searchBox=document.getElementById("searchBox");
                 if(searchBox){
                     searchBox.addEventListener("input", function(){
                         render(this.value);
@@ -481,15 +492,15 @@
                 }
 
                 // Sort buttons
-                document.querySelectorAll(".sortBtn").forEach(function(btn){
+                document.querySelectorAll(".sortBtn").forEach(btn=>{
                     btn.addEventListener("click", function(){
                         sortArticles(this.getAttribute("data-sort"));
                     });
                 });
 
                 // Key press searchbox
-                document.addEventListener("keydown", function(e){
-                    let active=document.activeElement?document.activeElement.tagName.toLowerCase(): "";
+                document.addEventListener("keydown", e=>{
+                    const active=document.activeElement?document.activeElement.tagName.toLowerCase(): "";
                     if(active!=="input" && active!=="textarea" && active!=="select"){
                         if(e.key.length===1 && !e.ctrlKey && !e.metaKey && !e.altKey){
                             e.preventDefault();
@@ -502,10 +513,11 @@
                     }
                 });
             }
-
         </script>
+
         <script>
             document.getElementById("code").innerText = document.getElementById("task_id").text;
         </script>
+
     </body>
 </html>
