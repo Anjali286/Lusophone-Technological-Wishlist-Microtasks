@@ -7,6 +7,8 @@ from urllib.parse import urlparse, urlencode, parse_qs
 time_out = 5
 # Input filename
 input_file = "Task 2 - Intern.csv"
+# URL parameters
+tracking_params = {"fbclid", "utm_source", "utm_medium", "utm_campaign", "utm_term", "utm_content", "platform"}
 
 request_header = {
     "User-Agent": (
@@ -59,13 +61,22 @@ def check_url(url, current, total):
       print(f"[{current}/{total}] (Unknown Error - {str(e)[:60]}) {url}")
       return
     
-#Normalize url for duplicate detection, removing http/https, www or slashes
+
 def normalize(url):
-    url = url.strip();
-    url = url.replace("https://","").replace("http://","")
-    url = url.replace("www.","")
-    url = url.rstrip("/")
-    return url.lower()
+    parsed = urlparse(url.strip().lower())
+    netloc = parsed.netloc.replace("www.", "")
+    path = parsed.path.rstrip("/")
+
+    params = {}
+    for key, value in parse_qs(parsed.query).items():
+        if key not in tracking_params:
+            params[key]=value
+
+    clean_query = urlencode(sorted(params.items()), doseq = True)
+    if clean_query:
+      return netloc + path + "?" + clean_query
+
+    return netloc+path
 
 
 def main():
@@ -109,9 +120,10 @@ def main():
         # Add protocol prefix if missing
         url = fix_missing_url(url)
 
-        # Normalize url, check for duplicates, and skip it with a warningif already visited
+        # Normalize url, check for duplicates, and skip it with a warning if already visited
         normalized_url = normalize(url)
         if normalized_url in visited_urls:
+          print(f"⚠ DUPLICATE DETECTED")
           continue
         visited_urls.add(normalized_url)
 
