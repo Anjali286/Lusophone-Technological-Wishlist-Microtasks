@@ -97,7 +97,7 @@ def main():
     current = 0
     total = len(rows_to_process)
 
-    visited_urls = set()
+    visited_urls = {}
 
     for row in rows_to_process:
   
@@ -123,9 +123,10 @@ def main():
         # Normalize url, check for duplicates, and skip it with a warning if already visited
         normalized_url = normalize(url)
         if normalized_url in visited_urls:
-          print(f"⚠ DUPLICATE DETECTED")
+          original_url = visited_urls[normalized_url]
+          print(f"⚠ DUPLICATE DETECTED: {url} --> {original_url}")
           continue
-        visited_urls.add(normalized_url)
+        visited_urls[normalized_url] = url
 
         # Visit URL and print status code or error message
         current += 1
