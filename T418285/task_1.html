@@ -227,7 +227,7 @@
                 return [31,28,31,30,31,30,31,31,30,31,30,31][month-1];
             }
 
-            // Function to format date
+            // Format date
             function formatDate(date){
                 if(date===null || date===undefined) return "Unknown Date";
 
@@ -345,7 +345,6 @@
                     sorted.sort((a, b)=>new Date(b.creation_date || 0)-new Date(a.creation_date || 0));
                 }
 
-                 
                 // Filter by query
                 const q=query?query.trim().toLowerCase():"";
                 let filtered=sorted;
@@ -358,6 +357,7 @@
                         return t.includes(q) || id.includes(q) || fd.includes(q);
                     });
                 }
+                
                 //Update count
                 const countDiv=document.getElementById("articleCount");
                 if(countDiv){

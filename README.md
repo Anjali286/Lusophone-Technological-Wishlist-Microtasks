@@ -10,7 +10,7 @@ An HTML file that reads a JSON array of Wikipedia articles and displays each art
 - Formats each one into the required sentence and displays it inside `#results`
 - Numbers each article (1, 2, 3...)
 - Makes each article title a `clickable link` to its Portuguese Wikipedia page
-- Handles null data, empty arrays, and missing fields
+- Handles null data, empty arrays, and missing fields, so the display never crashes or shows raw null values
 - Live search, sort controls, duplicate detection, statistics table
 
 ---
@@ -33,12 +33,12 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
 
 ### Search
 - Filters articles in real time as being typed
-- Searches across title, page ID, and date
-- Normalizes accents so typing `Andre` finds `André`
-- Bolds the matched text inside each sentence
-- Any key press on the page automatically goes to the search box
+- Searches across title, page ID, and date, so the user can find an article even without knowing its exact title
+- Normalizes accents so typing `Andre` finds `André`, essential for Portuguese content where accented characters are frequent
+- Bolds the matched text inside each sentence, so the user can immediately see where in the result the search term was found
+- Any key press on the page automatically goes to the search box, reducing friction without needing to click first
 - Shows "No articles found matching..." when nothing matches
-- Shows "Showing X of 12 articles" count while filtering
+- Shows "Showing X of 12 articles" count while filtering, so the user always knows how many results the current search returned
 <img width="416" height="56" alt="image" src="https://github.com/user-attachments/assets/dce74033-f8e2-49b6-8395-80c550af1801" />
 
 ---
@@ -47,8 +47,8 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
 - Sort A-Z by title
 - Sort by oldest article first
 - Sort by latest article first
-- Highlights the active sort button with a blue underline
-- Sort and search work together at the same time
+- Highlights the active sort button with a blue underline, so the user always knows which order is currently applied
+- Sort and search work together at the same time, so filtering a search term and then sorting re-orders only the visible results
 <img width="371" height="52" alt="image" src="https://github.com/user-attachments/assets/3d9cc205-662f-4c6b-b2d2-87952e0a3b88" />
 
 ---
@@ -57,36 +57,36 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
 - Shows total number of articles
 - Shows earliest article with its date and title
 - Shows latest article with its date and title
-- Shows the time span between earliest and latest years
+- Shows the time span between earliest and latest years, giving the user a quick sense of how far back the dataset reaches
 <img width="898" height="250" alt="image" src="https://github.com/user-attachments/assets/fe766c36-4cff-4387-b476-8241bf2e1927" />
 
 ---
 
 ### Date handling
 - Converts `"2021-09-13"` to `"September 13, 2021"` by string splitting
-- Uses no Date object, avoids timezone issues completely
+- Avoids Date object entirely as it silently shifts dates based on the user's locale, which breaks for international Wikimedia contributors
 - Validates month is between 1 and 12
 - Validates day against actual max days for that specific month
 - Checks leap year correctly for February
-- Returns `"Unknown Date"` for any invalid or missing date
+- Returns `"Unknown Date"` for any invalid or missing date, so the display never crashes or shows raw null values
 
 ---
 
 ### Duplicate handling
 - Checks for duplicate articles by `page_id` before rendering
 - If the same article appears more than once in the data, only the first occurrence is shown
-- The list is deduplicated silently — no duplicates ever reach the screen
+- The list is deduplicated silently, no error, no warning, duplicates simply never reach the screen
   
 ---
 
 ### Wikipedia Links
-- Every article title is a clickable link that opens the actual Portuguese Wikipedia page related to the article in a new tab
+- Every article title is a clickable link that opens the actual Portuguese Wikipedia page related to the article in a new tab, so the user can instantly read the full article without leaving the tool.
 - Links are built using the article title with `encodeURIComponent` to correctly handle accented Portuguese characters like `ã`, `é`, and `ô`
 
 ---
 
 ### Security
-- Escapes all strings before inserting into `innerHTML`
+- Escapes all strings before inserting into `innerHTML`, preventing XSS injection from malformed article titles or page IDs in the data source
 - This converts dangerous characters into safe HTML entities:
     -  `&` → `&amp;`
     -  `<` → `&lt;`
@@ -106,11 +106,11 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 - Reads URLs from `Task 2 - Intern.csv`
 - Visits each URL and fetches its status code
 - Prints the result in the required format: `(Status Code) URL`
-- Color-coded output for each status code based on what went wrong (or right)
-- Classifies each error specifically (Timeout, Connection Error, Domain not found, etc)
-- Detects and skips duplicate URLs automatically
-- If internet connection is interrupted, waits and retries up to 5 times for it to come back and then resumes.
-- Saves all results to a timestamped CSV file that can be opened and filtered in any spreadsheet tool.
+- Color-coded output for each status code, so the user can scan results at a glance without reading every status code individually
+- Classifies each error specifically (Timeout, Connection Error, Domain not found, etc), so the user know exactly what went wrong
+- Detects and skips duplicate URLs automatically, so no URL is checked twice and results stay clean
+- If internet connection is interrupted, waits and retries up to 5 times rather than crashing, and resumes from where it left off.
+- Saves all results to a timestamped CSV file, so the user can filter and categorize results by status, error type, or URL to track link health over time
 - Prints a full summary at the end
  
 ---
@@ -179,7 +179,7 @@ Before visiting a URL, the script normalizes it by:
 - Removing `www.`
 - Removing trailing slashes
 - Converting to lowercase
-This means `http://google.com`, `https://google.com`, `https://www.google.com/` are all treated as the same URL and checked only once.
+This means `http://google.com`, `https://google.com`, `https://www.google.com/` are all treated as the same URL and checked only once, so that differently written URLs pointing to the same source are not checked multiple times.
  
 ---
 
@@ -192,7 +192,7 @@ After all URLs are checked, the following stats are printed:
 
 ### CSV output file with filters
 All results are saved to a CSV file named with a timestamp.
-The file has three columns, status_code, url, and category. Results can be filtered by any column to easily find working links, broken links, dead domains, or any group in spreadsheet tools.
+The file has three columns, status_code, url, and category, so the user can filter the results by any column to easily find working links, broken links, dead domains, or any group in spreadsheet tools.
 
 ---
 
