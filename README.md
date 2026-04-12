@@ -31,11 +31,11 @@ https://github.com/user-attachments/assets/8d06a23a-b64a-4a9e-a849-f6fb3ec6777f
 ---
 
 ### Search
-- Filters articles in real time as being typed
+- Filters articles in real time as the user types
 - Searches across title, page ID, and date, so the user can find an article even without knowing its exact title
 - Normalizes accents so typing `Andre` finds `André`, essential for Portuguese content where accented characters are frequent
-- Bolds the matched text inside each sentence, so the user can immediately see where in the result the search term was found
-- Any key press on the page automatically goes to the search box, reducing friction without needing to click first
+- Highlights the matched text inside each sentence, so the user can immediately see where in the result the search term was found
+- Any key press on the page automatically goes to the search box, so the user does not need to click the search box first
 - Shows "No articles found matching..." when nothing matches
 - Shows "Showing X of 12 articles" count while filtering, so the user always knows how many results the current search returned
 <img width="416" height="56" alt="image" src="https://github.com/user-attachments/assets/dce74033-f8e2-49b6-8395-80c550af1801" />
@@ -101,17 +101,17 @@ https://github.com/user-attachments/assets/8d06a23a-b64a-4a9e-a849-f6fb3ec6777f
 ---
 
 ## Task 2
-A Python script that reads a list of URLs from a CSV file, visits each one, and reports its HTTP status code, with color-coded output, detailed error classification, automatic internet recovery, duplicate detection, and a filterable CSV report.
+A Python script that reads a list of URLs from a CSV file, visits each one, and reports its HTTP status code, with detailed error classification, and duplicate detection.
 
 ---
 
 ### What it does
 - Reads URLs from `Task 2 - Intern.csv`
-- Visits each URL and fetches its status code
+- Visits each URL and prints its HTTP status code
 - Prints the result in the required format: `(Status Code) URL`
 - Classifies each error specifically (Timeout, Connection Error, Domain not found, etc), so the user know exactly what went wrong
-- Detects and skips duplicate URLs with a warning automatically, so no URL is checked twice and results stay clean
-- **Ensures two urls with different tracking parameters pointing to the same source caught as duplicates**
+- Automatically detects and skips duplicate URLs with a warning, so no URL is checked twice and results stay clean
+- **Ensures two urls with different tracking parameters pointing to the same source are caught as duplicates**
  
 ---
 
@@ -152,7 +152,7 @@ The `[current/total]` counter tracks the progress.
 | `(404)` | Page not found | Logs as Client Error, moves to next URL |
 | `(503)` | Server temporarily unavailable | Logs as Server Error, moves to next URL |
 | `(Timeout)` | Server did not respond in 10 seconds | Logs as Timeout, moves to next URL |
-| `(Connection Error)` | Could not connect to the server | Checks if internet is down, if yes, waits and retries, otherwise, logs and moves on |
+| `(Connection Error)` | Could not connect to the server | Logs as Connection Error|
 | `(Domain not found)` | Domain does not exist anymore | Logs as Domain not found, moves to next URL |
 | `(SSL Error)` | Invalid security certificate | Logs as SSL Error, moves to next URL |
 | `(Too many Redirects)` | Website is stuck in a redirect loop | Logs as Too Many Redirects, moves to next URL|
@@ -163,7 +163,7 @@ The `[current/total]` counter tracks the progress.
 ### Duplicate detection
 The script detects when two URLs in the CSV point to the same source, even if they look different on the surface.
 After studying the CSV carefully, two real cases were found:
-- Two ESPN URLs in the CSV point to the exact same article but appear different because of extra parameters appended to them, one has ?fbclid=...   (a Facebook tracking tag) and the other has ?platform=amp (an AMP version flag) and they have the same id (9645295). Same article, different     parameters.
+- Two ESPN URLs in the CSV point to the exact same article but appear different because of extra parameters appended to them, one has ?fbclid=...   (a Facebook tracking tag) and the other has ?platform=amp (an AMP version flag) and they have the same id (9645295). Same article, different parameters.
 - Two ogol.com.br URLs both have ?id=433300 but different paths (player.php vs player_titles.php). These are genuinely different pages.
 
 If duplicate detection is done based on matching id query parameter values, URLs sharing the same id get correctly detected as duplicates, as in the case of ESPN URLs. However, two URLs with the same id value but different paths point to genuinely different pages and would be incorrectly detected as duplicates as in the case of ogol.com URLs.
@@ -176,7 +176,7 @@ Therefore, developed a normalize() function that cleans each URL into a standard
 - Sorting: remaining parameters are sorted alphabetically so ?a=1&b=2 and ?b=2&a=1 are treated as the same URL.
 - Rebuilding: the cleaned pieces are joined back into one comparable string.
 
-This way the ESPN URLs both normalize to the same string and the duplicate is caught and the ogol URLs have different paths so they are correctly treated as different URLs even after normalization. 
+This way, the ESPN URLs both normalize to the same string and the duplicate is caught and the ogol URLs have different paths so they are correctly treated as different URLs even after normalization. 
 
 When a duplicate is found the script prints:
 
@@ -198,6 +198,6 @@ Other libraries used (`csv` and `sys`) are built into Python, hence require no i
 ### Improvements made after feedback
  - Removed color-coded output feature, retry logic, summary,  and timestamped CSV output as these added complexity without being required by the     task
  - Used with open() for file handling so the file closes automatically even if something goes wrong
- - Refined the duplicate detection logic, ensuring two urls with different tracking parameters pointing to the same source caught as duplicates 
- - Used DictReader instead of reader as the given CSV is small, structured and has a header; DictReader automatically handles the header row
+ - Refined the duplicate detection logic, ensuring two urls with different tracking parameters pointing to the same source are caught as duplicates 
+ - Used DictReader instead of reader as, the given CSV is small, structured and has a header; DictReader automatically handles the header row
  - Changed visited_urls from a set to a dictionary so the script can show which original URL a duplicate was matched against
