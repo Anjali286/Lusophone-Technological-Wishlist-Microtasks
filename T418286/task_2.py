@@ -91,8 +91,6 @@ def main():
     # If no rows to process, print message and exit
     if not rows_to_process:
         print(f"File '{input_file}' is empty.")
-        file.close()
-        sys.exit()
     
     current = 0
     total = len(rows_to_process)
@@ -120,16 +118,17 @@ def main():
         # Add protocol prefix if missing
         url = fix_missing_url(url)
 
+        current += 1
+
         # Normalize url, check for duplicates, and skip it with a warning if already visited
         normalized_url = normalize(url)
         if normalized_url in visited_urls:
           original_url = visited_urls[normalized_url]
-          print(f"⚠ DUPLICATE DETECTED: {url} --> {original_url}")
+          print(f"[{current}/{total}] ⚠ DUPLICATE DETECTED: {url} --> {original_url}")
           continue
         visited_urls[normalized_url] = url
 
         # Visit URL and print status code or error message
-        current += 1
         check_url(url, current, total)
 
 if __name__ == "__main__":
