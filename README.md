@@ -168,10 +168,10 @@ After studying the CSV carefully, two real cases were found:
 
 If duplicate detection is done based on matching id query parameter values, URLs sharing the same id get correctly detected as duplicates, as in the case of ESPN URLs. However, two URLs with the same id value but different paths point to genuinely different pages and would be incorrectly detected as duplicates as in the case of ogol.com URLs.
 
-The challenge is to design a normalization approach that correctly handles both cases.
+The challenge was to design a normalization approach that correctly handles both cases.
 
 Therefore, developed a normalize() function that cleans each URL into a standard form by removing the tracking parameters before comparing. It does this in four steps:
-- Parsing: the URL is broken into separate pieces - domain, path, query parameters. Also removes www., trailing slashes, and lowercase everything.
+- Parsing: the URL is broken into separate pieces - domain, path, query parameters. www. is removed, trailing slashes are stripped, and             everything is converted into lowercase.
 - Filtering: known tracking parameters like fbclid, platform, and utm_* are removed. Functional parameters like id= that identify the actual page   are kept.
 - Sorting: remaining parameters are sorted alphabetically so ?a=1&b=2 and ?b=2&a=1 are treated as the same URL.
 - Rebuilding: the cleaned pieces are joined back into one comparable string.
@@ -183,7 +183,7 @@ When a duplicate is found the script prints:
 <img width="1475" height="88" alt="image" src="https://github.com/user-attachments/assets/6061e311-7afe-4858-bdee-f7181e77e39d" />
 
 
-**Wishlist #3 is about detecting when a reference being added to Wikipedia already exists, the core challenge being that the same source can appear in different forms. This script addresses the same challenge at the URL level, two URLs in the CSV point to the same article but look different because of tracking parameters attached to them. The normalize() function handles this by identifying which URL differences are meaningful (different paths, different page IDs) and which are not (tracking parameters), so that only genuine duplicates are detected.**
+Wishlist #3 is about detecting when a reference being added to Wikipedia already exists, the core challenge being that the same source can appear in different forms. This script addresses the same challenge at the URL level, two URLs in the CSV point to the same article but look different because of tracking parameters attached to them. The normalize() function handles this by identifying which URL differences are meaningful (different paths, different page IDs) and which are not (tracking parameters), so that only genuine duplicates are detected.
 
 ---
 
@@ -200,4 +200,4 @@ Other libraries used (`csv` and `sys`) are built into Python, hence require no i
  - Used with open() for file handling so the file closes automatically even if something goes wrong
  - Refined the duplicate detection logic, ensuring two urls with different tracking parameters pointing to the same source caught as duplicates 
  - Used DictReader instead of reader as the given CSV is small, structured and has a header; DictReader automatically handles the header row
- - Changed visited_urls from a set to a dictionary so the script can show which original URL a duplicate is matched against
+ - Changed visited_urls from a set to a dictionary so the script can show which original URL a duplicate was matched against
