@@ -196,7 +196,7 @@
             ];
 
             // YOUR CODE HERE 
-            const months=["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
             let currentSort="az";
             let processed=[];
 
@@ -237,14 +237,20 @@
                 const parts=date.split("-");
                 if(parts.length!==3) return "Unknown Date";
 
-                const year=parts[0].trim();
-                const month=parseInt(parts[1],10);
-                const day=parseInt(parts[2],10);
+                const year=parseInt(parts[0], 10);
+                const month=parseInt(parts[1], 10);
+                const day=parseInt(parts[2], 10);
 
                 if(isNaN(month) || month<1 || month>12) return "Unknown Date";
                 if(isNaN(day) || day<1 || day>getMaxDays(month,parseInt(year,10))) return "Unknown Date";
-
-                return months[month - 1]+ " "+day+", "+year;
+                
+                // Use Intl.DateTimeFormat as per the feedback
+                const monthName=new Intl.DateTimeFormat("en",{
+                    month: "long",
+                    timeZone: "UTC"
+                }).format( new Date(Date.UTC(year, month-1, day)));
+                
+                return monthName+ " "+day+", "+year;
             }
 
             // Highlight the matched text
