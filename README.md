@@ -62,7 +62,7 @@ https://github.com/user-attachments/assets/8d06a23a-b64a-4a9e-a849-f6fb3ec6777f
 ---
 
 ### Date handling
-- Converts "2021-09-13" to "September 13, 2021"​ using Intl.DateTimeFormat with timeZone:      "UTC" to get month names, replacing hardcoded array, spelling mistakes, easy to switch      languages
+- Converts "2021-09-13" to "September 13, 2021" using Intl.DateTimeFormat with timeZone: "UTC", replacing the hardcoded month names array. This prevents spelling mistakes and makes it easy to switch languages.
 - Validates month is between 1 and 12
 - Validates day against actual max days for that specific month
 - Checks leap year correctly for February
@@ -96,7 +96,7 @@ https://github.com/user-attachments/assets/8d06a23a-b64a-4a9e-a849-f6fb3ec6777f
 ---
 
 ### Improvements made after mentor feedback
-- Replaced the hardcoded month names array with Intl.DateTimeFormat . Now the browser         generates month names automatically, which prevents spelling mistakes and makes it easy     to switch to Portuguese or any other language by just changing "en" to "pt"
+- Replaced the hardcoded month names array with Intl.DateTimeFormat. Now the browser generates month names automatically, which prevents spelling mistakes and makes it easy to switch to Portuguese or any other language by just changing "en" to "pt"
 
 ---
 
@@ -109,7 +109,7 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 - Reads URLs from `Task 2 - Intern.csv`
 - Visits each URL and prints its HTTP status code
 - Prints the result in the required format: `(Status Code) URL`
-- Classifies each error specifically (Timeout, Connection Error, Domain not found, etc), so the user know exactly what went wrong
+- Classifies each error specifically (Timeout, Connection Error, Domain not found, etc), so the user knows exactly what went wrong
 - Automatically detects and skips duplicate URLs with a warning, so no URL is checked twice and results stay clean
 - **Ensures two urls with different tracking parameters pointing to the same source are caught as duplicates**
  
@@ -146,13 +146,13 @@ The `[current/total]` counter tracks the progress.
 ### Specific error classification
 | Error printed | What it means | What the script does |
 |---|---|---|
-| `(200)` | URL is working fine | Working, prints in green |
+| `(200)` | URL is working fine | Working |
 | `(301)` / `(302)` | URL has moved to a new address | Follows the redirect automatically, logs final status |
 | `(403)` | Server blocked the request | Logs as Client Error, moves to next URL |
 | `(404)` | Page not found | Logs as Client Error, moves to next URL |
 | `(503)` | Server temporarily unavailable | Logs as Server Error, moves to next URL |
 | `(Timeout)` | Server did not respond in 10 seconds | Logs as Timeout, moves to next URL |
-| `(Connection Error)` | Could not connect to the server | Logs as Connection Error|
+| `(Connection Error)` | Could not connect to the server | Logs as Connection Error, moves to next URL|
 | `(Domain not found)` | Domain does not exist anymore | Logs as Domain not found, moves to next URL |
 | `(SSL Error)` | Invalid security certificate | Logs as SSL Error, moves to next URL |
 | `(Too many Redirects)` | Website is stuck in a redirect loop | Logs as Too Many Redirects, moves to next URL|
@@ -163,17 +163,17 @@ The `[current/total]` counter tracks the progress.
 ### Duplicate detection
 The script detects when two URLs in the CSV point to the same source, even if they look different on the surface.
 After studying the CSV carefully, two real cases were found:
-- Two ESPN URLs in the CSV point to the exact same article but appear different because of extra parameters appended to them, one has ?fbclid=...   (a Facebook tracking tag) and the other has ?platform=amp (an AMP version flag) and they have the same id (9645295). Same article, different parameters.
-- Two ogol.com.br URLs both have ?id=433300 but different paths (player.php vs player_titles.php). These are genuinely different pages.
+- Two ESPN URLs in the CSV point to the exact same article but appear different because of extra parameters appended to them, one has `?fbclid=...` (a Facebook tracking tag) and the other has `?platform=amp` (an AMP version flag) and they have the same id (9645295). Same article, different parameters.
+- Two ogol.com.br URLs both have `?id=433300` but different paths (player.php vs player_titles.php). These are genuinely different pages.
 
 If duplicate detection is done based on matching id query parameter values, URLs sharing the same id get correctly detected as duplicates, as in the case of ESPN URLs. However, two URLs with the same id value but different paths point to genuinely different pages and would be incorrectly detected as duplicates as in the case of ogol.com URLs.
 
 The challenge was to design a normalization approach that correctly handles both cases.
 
 Therefore, developed a normalize() function that cleans each URL into a standard form by removing the tracking parameters before comparing. It does this in four steps:
-- Parsing: the URL is broken into separate pieces - domain, path, query parameters. www. is removed, trailing slashes are stripped, and             everything is converted into lowercase.
-- Filtering: known tracking parameters like fbclid, platform, and utm_* are removed. Functional parameters like id= that identify the actual page   are kept.
-- Sorting: remaining parameters are sorted alphabetically so ?a=1&b=2 and ?b=2&a=1 are treated as the same URL.
+- Parsing: the URL is broken into separate pieces - domain, path, query parameters. www. is removed, trailing slashes are stripped, and everything is converted into lowercase.
+- Filtering: known tracking parameters like `fbclid`, `platform`, and `utm_*` are removed. Functional parameters like id= that identify the actual page are kept.
+- Sorting: remaining parameters are sorted alphabetically so `?a=1&b=2` and `?b=2&a=1` are treated as the same URL.
 - Rebuilding: the cleaned pieces are joined back into one comparable string.
 
 This way, the ESPN URLs both normalize to the same string and the duplicate is caught and the ogol URLs have different paths so they are correctly treated as different URLs even after normalization. 
@@ -183,7 +183,9 @@ When a duplicate is found the script prints:
 <img width="1475" height="88" alt="image" src="https://github.com/user-attachments/assets/6061e311-7afe-4858-bdee-f7181e77e39d" />
 
 
-Wishlist #3 is about detecting when a reference being added to Wikipedia already exists, the core challenge being that the same source can appear in different forms. This script addresses the same challenge at the URL level, two URLs in the CSV point to the same article but look different because of tracking parameters attached to them. The normalize() function handles this by identifying which URL differences are meaningful (different paths, different page IDs) and which are not (tracking parameters), so that only genuine duplicates are detected.
+**How this duplicate detection aligns with Wishlist #3**
+
+Wishlist #3 is about detecting when a reference being added to Wikipedia already exists, the core challenge being that the same source can appear in different forms. This script addresses the same challenge at the URL level, two URLs in the CSV point to the same article but look different due to tracking parameters. The normalize() function handles this by identifying which URL differences are meaningful (different paths, different page IDs) and which are not (tracking parameters), so that only genuine duplicates are detected.
 
 ---
 
@@ -196,8 +198,8 @@ requests — visits URLs and gets HTTP status codes
 Other libraries used (`csv` and `sys`) are built into Python, hence require no installation.
 
 ### Improvements made after feedback
- - Removed color-coded output feature, retry logic, summary,  and timestamped CSV output as these added complexity without being required by the     task
+ - Removed color-coded output feature, retry logic, summary, and timestamped CSV output as these added complexity without being required by the task
  - Used with open() for file handling so the file closes automatically even if something goes wrong
  - Refined the duplicate detection logic, ensuring two urls with different tracking parameters pointing to the same source are caught as duplicates 
- - Used DictReader instead of reader as, the given CSV is small, structured and has a header; DictReader automatically handles the header row
+ - Used DictReader instead of reader, as the given CSV is small, structured and has a header; DictReader automatically handles the header row
  - Changed visited_urls from a set to a dictionary so the script can show which original URL a duplicate was matched against
