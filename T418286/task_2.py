@@ -61,7 +61,7 @@ def check_url(url, current, total):
       print(f"[{current}/{total}] (Unknown Error - {str(e)[:60]}) {url}")
       return
     
-
+# Normalize URL for duplicate detection by removing protocol, www, trailing slashes, and tracking parameters
 def normalize(url):
     parsed = urlparse(url.strip().lower())
     netloc = parsed.netloc.replace("www.", "")
