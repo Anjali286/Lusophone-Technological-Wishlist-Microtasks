@@ -182,6 +182,9 @@ When a duplicate is found the script prints:
 
 <img width="1475" height="88" alt="image" src="https://github.com/user-attachments/assets/6061e311-7afe-4858-bdee-f7181e77e39d" />
 
+
+**Wishlist #3 is about detecting when a reference being added to Wikipedia already exists, the core challenge being that the same source can appear in different forms. This script addresses the same challenge at the URL level, two URLs in the CSV point to the same article but look different because of tracking parameters attached to them. The normalize() function handles this by identifying which URL differences are meaningful (different paths, different page IDs) and which are not (tracking parameters), so that only genuine duplicates are detected.**
+
 ---
 
 ### Dependencies
