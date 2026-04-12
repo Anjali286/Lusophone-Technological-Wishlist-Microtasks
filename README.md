@@ -26,8 +26,7 @@ Open task_1.html in any modern browser.
 - Styled to match Wikipedia's visual language so the output feels native to the Wikimedia ecosystem
 - Displays each article in a formatted sentence:
 
-https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
-
+https://github.com/user-attachments/assets/8d06a23a-b64a-4a9e-a849-f6fb3ec6777f
 
 ---
 
@@ -63,8 +62,7 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
 ---
 
 ### Date handling
-- Converts `"2021-09-13"` to `"September 13, 2021"` by string splitting
-- Avoids Date object entirely as it silently shifts dates based on the user's locale, which breaks for international Wikimedia contributors
+- Converts "2021-09-13" to "September 13, 2021"​ using Intl.DateTimeFormat with timeZone:      "UTC" to get month names, replacing hardcoded array, spelling mistakes, easy to switch      languages
 - Validates month is between 1 and 12
 - Validates day against actual max days for that specific month
 - Checks leap year correctly for February
@@ -97,6 +95,11 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
 
 ---
 
+### Improvements made after mentor feedback
+- Replaced the hardcoded month names array with Intl.DateTimeFormat . Now the browser         generates month names automatically, which prevents spelling mistakes and makes it easy     to switch to Portuguese or any other language by just changing "en" to "pt"
+
+---
+
 ## Task 2
 A Python script that reads a list of URLs from a CSV file, visits each one, and reports its HTTP status code, with color-coded output, detailed error classification, automatic internet recovery, duplicate detection, and a filterable CSV report.
 
@@ -106,12 +109,9 @@ A Python script that reads a list of URLs from a CSV file, visits each one, and 
 - Reads URLs from `Task 2 - Intern.csv`
 - Visits each URL and fetches its status code
 - Prints the result in the required format: `(Status Code) URL`
-- Color-coded output for each status code, so the user can scan results at a glance without reading every status code individually
 - Classifies each error specifically (Timeout, Connection Error, Domain not found, etc), so the user know exactly what went wrong
-- Detects and skips duplicate URLs automatically, so no URL is checked twice and results stay clean
-- If internet connection is interrupted, waits and retries up to 5 times rather than crashing, and resumes from where it left off.
-- Saves all results to a timestamped CSV file, so the user can filter and categorize results by status, error type, or URL to track link health over time
-- Prints a full summary at the end
+- Detects and skips duplicate URLs with a warning automatically, so no URL is checked twice and results stay clean
+- **Ensures two urls with different tracking parameters pointing to the same source caught as duplicates**
  
 ---
 
@@ -136,23 +136,10 @@ python task_2.py
 ### Output Format
 Each URL is printed like:
 
-<img width="1235" height="302" alt="image" src="https://github.com/user-attachments/assets/c9edcfc5-b54c-4b3a-8909-547bb3f61e5c" />
+<img width="1491" height="354" alt="image" src="https://github.com/user-attachments/assets/6e588ff8-ce03-437c-a4cc-66867b6d2133" />
+
 
 The `[current/total]` counter tracks the progress.
-
----
-
-### Color-coded output
-Every line is printed in a color that tells you exactly what happened at a glance.
-| Color | Status | What it means |
-|---|---|---|
-| **Green** | 2xx | Successful Response |
-| **Yellow** | 3xx | Redirection Message |
-| **Orange** | 4xx | Client error response |
-| **Red** | 5xx | Server error response |
-| **Magenta** | Timeout / Connection Error / SSL Error | Network failure |
-| **Dark Grey** | Domain not found | The domain does not exist at all |
-| **Yellow** | Invalid URL / Skipped | Incorrect web address |
 
 ---
 
@@ -174,33 +161,40 @@ Every line is printed in a color that tells you exactly what happened at a glanc
 ---
 
 ### Duplicate detection
-Before visiting a URL, the script normalizes it by:
-- Removing `http://` and `https://`
-- Removing `www.`
-- Removing trailing slashes
-- Converting to lowercase
-This means `http://google.com`, `https://google.com`, `https://www.google.com/` are all treated as the same URL and checked only once, so that differently written URLs pointing to the same source are not checked multiple times.
- 
----
+The script detects when two URLs in the CSV point to the same source, even if they look different on the surface.
+After studying the CSV carefully, two real cases were found:
+- Two ESPN URLs in the CSV point to the exact same article but appear different because of extra parameters appended to them, one has ?fbclid=...   (a Facebook tracking tag) and the other has ?platform=amp (an AMP version flag) and they have the same id (9645295). Same article, different     parameters.
+- Two ogol.com.br URLs both have ?id=433300 but different paths (player.php vs player_titles.php). These are genuinely different pages.
 
-### Summary printed at the end
-After all URLs are checked, the following stats are printed:
+If duplicate detection is done based on matching id query parameter values, URLs sharing the same id get correctly detected as duplicates, as in the case of ESPN URLs. However, two URLs with the same id value but different paths point to genuinely different pages and would be incorrectly detected as duplicates as in the case of ogol.com URLs.
 
-<img width="578" height="281" alt="image" src="https://github.com/user-attachments/assets/8a494e87-7ff9-4d69-b612-a2ce183e9e30" />
+The challenge is to design a normalization approach that correctly handles both cases.
 
----
+Therefore, developed a normalize() function that cleans each URL into a standard form by removing the tracking parameters before comparing. It does this in four steps:
+- Parsing: the URL is broken into separate pieces - domain, path, query parameters. Also removes www., trailing slashes, and lowercase everything.
+- Filtering: known tracking parameters like fbclid, platform, and utm_* are removed. Functional parameters like id= that identify the actual page   are kept.
+- Sorting: remaining parameters are sorted alphabetically so ?a=1&b=2 and ?b=2&a=1 are treated as the same URL.
+- Rebuilding: the cleaned pieces are joined back into one comparable string.
 
-### CSV output file with filters
-All results are saved to a CSV file named with a timestamp.
-The file has three columns, status_code, url, and category, so the user can filter the results by any column to easily find working links, broken links, dead domains, or any group in spreadsheet tools.
+This way the ESPN URLs both normalize to the same string and the duplicate is caught and the ogol URLs have different paths so they are correctly treated as different URLs even after normalization. 
+
+When a duplicate is found the script prints:
+
+<img width="1475" height="88" alt="image" src="https://github.com/user-attachments/assets/6061e311-7afe-4858-bdee-f7181e77e39d" />
 
 ---
 
 ### Dependencies
 - Requires Python 3.7+
-- Requires two libraries
+- Requires one library
 ```
 requests — visits URLs and gets HTTP status codes
-colorama — adds color to the output
 ```
-All other libraries used (`csv`, `sys`, `re`, `time`, `urllib`) are built into Python, hence require no installation.
+Other libraries used (`csv` and `sys`) are built into Python, hence require no installation.
+
+### Improvements made after feedback
+ - Removed color-coded output feature, retry logic, summary,  and timestamped CSV output as these added complexity without being required by the     task
+ - Used with open() for file handling so the file closes automatically even if something goes wrong
+ - Refined the duplicate detection logic, ensuring two urls with different tracking parameters pointing to the same source caught as duplicates 
+ - Used DictReader instead of reader as the given CSV is small, structured and has a header; DictReader automatically handles the header row
+ - Changed visited_urls from a set to a dictionary so the script can show which original URL a duplicate is matched against
