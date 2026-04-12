@@ -26,8 +26,7 @@ Open task_1.html in any modern browser.
 - Styled to match Wikipedia's visual language so the output feels native to the Wikimedia ecosystem
 - Displays each article in a formatted sentence:
 
-https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
-
+https://github.com/user-attachments/assets/8d06a23a-b64a-4a9e-a849-f6fb3ec6777f
 
 ---
 
@@ -63,8 +62,7 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
 ---
 
 ### Date handling
-- Converts `"2021-09-13"` to `"September 13, 2021"` by string splitting
-- Avoids Date object entirely as it silently shifts dates based on the user's locale, which breaks for international Wikimedia contributors
+- Converts "2021-09-13" to "September 13, 2021"​ using Intl.DateTimeFormat with timeZone:      "UTC" to get month names, replacing hardcoded array, spelling mistakes, easy to switch      languages
 - Validates month is between 1 and 12
 - Validates day against actual max days for that specific month
 - Checks leap year correctly for February
@@ -94,6 +92,11 @@ https://github.com/user-attachments/assets/43dc7fac-aacf-4d88-9954-b53ef1ca3367
     -  `"` → `&quot;`
     -  `'` → `&#x27;`
 - Wikipedia links use `rel="noopener noreferrer"` for security
+
+---
+
+### Improvements made after mentor feedback
+- Replaced the hardcoded month names array with Intl.DateTimeFormat . Now the browser         generates month names automatically, which prevents spelling mistakes and makes it easy     to switch to Portuguese or any other language by just changing "en" to "pt"
 
 ---
 
@@ -173,7 +176,9 @@ Therefore, developed a normalize() function that cleans each URL into a standard
 - Sorting: remaining parameters are sorted alphabetically so ?a=1&b=2 and ?b=2&a=1 are treated as the same URL.
 - Rebuilding: the cleaned pieces are joined back into one comparable string.
 
-This way the ESPN URLs both normalize to the same string and the duplicate is caught and the ogol URLs have different paths so they are correctly treated as different URLs even after normalization. When a duplicate is found the script prints:
+This way the ESPN URLs both normalize to the same string and the duplicate is caught and the ogol URLs have different paths so they are correctly treated as different URLs even after normalization. 
+
+When a duplicate is found the script prints:
 
 <img width="1475" height="88" alt="image" src="https://github.com/user-attachments/assets/6061e311-7afe-4858-bdee-f7181e77e39d" />
 
