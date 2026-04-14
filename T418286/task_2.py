@@ -30,7 +30,7 @@ def fix_missing_url(url):
 # Attempt to fetch URL and print the status code or specific error message
 def check_url(url, current, total):
     try:
-        response = requests.get(url, timeout = time_out, allow_redirects = True, headers = request_header)
+        response = requests.head(url, timeout = time_out, allow_redirects = True, headers = request_header)
         print(f"[{current}/{total}] ({response.status_code}) {url}")
         return
     
