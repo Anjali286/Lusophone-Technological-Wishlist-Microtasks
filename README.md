@@ -203,3 +203,4 @@ Other libraries used (`csv` and `sys`) are built into Python, hence require no i
  - Refined the duplicate detection logic, ensuring two urls with different tracking parameters pointing to the same source are caught as duplicates 
  - Used DictReader instead of reader, as the given CSV is small, structured and has a header; DictReader automatically handles the header row
  - Changed visited_urls from a set to a dictionary so the script can show which original URL a duplicate was matched against
+ - Used 'head' request instead of 'get' request to retrieve metadata only.
